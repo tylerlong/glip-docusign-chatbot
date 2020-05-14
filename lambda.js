@@ -14,6 +14,9 @@ module.exports.maintain = async () => axios.put(`${process.env.RINGCENTRAL_CHATB
 })
 
 module.exports.webhook = async (event) => {
-  console.log(JSON.stringify(event))
-  return 'Done'
+  return {
+    statusCode: 200,
+    body: JSON.stringify(event),
+    headers: { 'Content-Type': 'application/json' }
+  }
 }
