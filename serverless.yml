@@ -3,7 +3,7 @@ service: glip-docusign-chatbot
 provider:
   stage: prod
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   region: us-east-1
   memorySize: 256
   timeout: 30 # maximum value allowed by api gateway
@@ -34,14 +34,6 @@ functions:
     timeout: 300 # this value is not allowed by api gateway but we have proxy below to workaround it
     events:
       - http: 'GET /admin/diagnostic'
-  # test:
-  #   handler: lambda.test
-  #   events:
-  #     - http: 'GET /test'
-  crontab:
-    handler: lambda.crontab
-    events:
-      - schedule: rate(1 day)
   proxy:
     handler: lambda.proxy
     events:
@@ -50,6 +42,10 @@ functions:
     handler: lambda.maintain
     events:
       - schedule: rate(1 day)
+  webhook:
+    handler: lambda.webhook
+    events:
+      - http: 'POST /webhook'
 
 resources:
   Resources:
