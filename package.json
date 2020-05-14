@@ -1,0 +1,20 @@
+{
+  "name": "glip-docusign-chatbot",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "test": "node -r dotenv-override-true/config index.js"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "pg": "^8.2.0",
+    "ringcentral-chatbot": "^1.2.5",
+    "serverless-http": "^2.4.1"
+  },
+  "devDependencies": {
+    "dotenv-override-true": "^6.2.0",
+    "serverless": "^1.70.1",
+    "standard": "^14.3.4",
+    "yarn-upgrade-all": "^0.5.2"
+  }
+}
