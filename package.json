@@ -9,10 +9,12 @@
     "axios": "^0.19.2",
     "pg": "^8.2.0",
     "ringcentral-chatbot": "^1.2.5",
-    "serverless-http": "^2.4.1"
+    "serverless-http": "^2.4.1",
+    "x2js": "^3.4.0"
   },
   "devDependencies": {
     "dotenv-override-true": "^6.2.0",
+    "ngrok": "^3.2.7",
     "serverless": "^1.70.1",
     "standard": "^14.3.4",
     "yarn-upgrade-all": "^0.5.2"
