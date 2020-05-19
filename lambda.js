@@ -3,6 +3,9 @@ const { createAsyncProxy } = require('ringcentral-chatbot/dist/lambda')
 const serverlessHTTP = require('serverless-http')
 const axios = require('axios')
 const { Bot } = require('ringcentral-chatbot/dist/models')
+const X2JS = require('x2js')
+
+const x2js = new X2JS()
 
 const app = createApp()
 module.exports.app = serverlessHTTP(app)
@@ -23,12 +26,14 @@ module.exports.webhook = async (event) => {
     }
   }
   const bot = bots[0]
-  const json = JSON.parse(event.body)
-  let r = await bot.rc.post('/restapi/v1.0/glip/conversations', { members: [json.glip] })
+  const json = x2js.xml2js(event.body)
+  console.log(event.body)
+  const email = json.DocuSignEnvelopeInformation.EnvelopeStatus.Email
+  let r = await bot.rc.post('/restapi/v1.0/glip/conversations', { members: [{ email }] })
   console.log(JSON.stringify(r.data))
   r = await await bot.rc.post('/restapi/v1.0/glip/posts', {
     groupId: r.data.id,
-    text: `Please [sign this DocuSign Document](${json.docusign.link})`
+    text: `You have a document to sign, please check your inbox of ${email}.`
   })
   console.log(JSON.stringify(r.data))
   return {
