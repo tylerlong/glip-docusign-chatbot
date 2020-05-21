@@ -3,3 +3,4 @@ node_modules/
 .env.yml
 .serverless/
 .secret
+notes.md

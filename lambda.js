@@ -4,6 +4,7 @@ const serverlessHTTP = require('serverless-http')
 const axios = require('axios')
 const { Bot } = require('ringcentral-chatbot/dist/models')
 const X2JS = require('x2js')
+const qs = require('qs')
 
 const x2js = new X2JS()
 
@@ -42,8 +43,9 @@ module.exports.webhook = async (event) => {
   }
 }
 
+const redirectUri = `${process.env.RINGCENTRAL_CHATBOT_SERVER}/docusign/callback`
 module.exports.login = async (event) => {
-  const url = `https://account-d.docusign.com/oauth/auth?response_type=code&scope=signature&&client_id=${process.env.DOCUSIGN_INTEGRATION_KEY}&redirect_uri=${process.env.RINGCENTRAL_CHATBOT_SERVER}/docusign/callback&login_hint=${process.env.DOCUSIGN_ADMIN_EMAIL}`
+  const url = `https://account${process.env.DOCUSIGN_PRODUCTION ? '' : '-d'}.docusign.com/oauth/auth?response_type=code&scope=signature&&client_id=${process.env.DOCUSIGN_INTEGRATION_KEY}&redirect_uri=${redirectUri}&login_hint=${process.env.DOCUSIGN_ADMIN_EMAIL}`
   return {
     statusCode: 301,
     headers: {
@@ -53,8 +55,19 @@ module.exports.login = async (event) => {
 }
 
 module.exports.callback = async (event) => {
+  const code = event.queryStringParameters.code
+  const r = await axios.post(`https://account${process.env.DOCUSIGN_PRODUCTION ? '' : '-d'}.docusign.com/oauth/token`, {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${process.env.DOCUSIGN_INTEGRATION_KEY}:${process.env.DOCUSIGN_SECRET_KEY}`).toString('base64')}`
+    },
+    data: qs.stringify({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: redirectUri
+    })
+  })
   return {
     statusCode: 200,
-    body: JSON.stringify(event, null, 2)
+    body: JSON.stringify(r.data, 2, null)
   }
 }
