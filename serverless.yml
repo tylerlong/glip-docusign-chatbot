@@ -45,7 +45,15 @@ functions:
   webhook:
     handler: lambda.webhook
     events:
-      - http: 'POST /webhook'
+      - http: 'POST /docusign/webhook'
+  login:
+    handler: lambda.login
+    events:
+      - http: 'GET /docusign/login'
+  callback:
+    handler: lambda.callback
+    events:
+      - http: 'GET /docusign/callback'
 
 resources:
   Resources:

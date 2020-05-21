@@ -41,3 +41,20 @@ module.exports.webhook = async (event) => {
     body: 'Done'
   }
 }
+
+module.exports.login = async (event) => {
+  const url = `https://account-d.docusign.com/oauth/auth?response_type=code&scope=signature&&client_id=${process.env.DOCUSIGN_INTEGRATION_KEY}&redirect_uri=${process.env.RINGCENTRAL_CHATBOT_SERVER}/docusign/callback&login_hint=${process.env.DOCUSIGN_ADMIN_EMAIL}`
+  return {
+    statusCode: 301,
+    headers: {
+      Location: url
+    }
+  }
+}
+
+module.exports.callback = async (event) => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify(event, null, 2)
+  }
+}
