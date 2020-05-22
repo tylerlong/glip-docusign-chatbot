@@ -69,7 +69,8 @@ module.exports.callback = async (event) => {
     },
     data: qs.stringify({
       grant_type: 'authorization_code',
-      code
+      code,
+      redirect_uri: redirectUri
     })
   })
   const result = `HTTP ${r.status} ${r.statusText}${
