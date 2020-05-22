@@ -6,11 +6,7 @@ const axios = require('axios')
       return true
     }
   }).request({
-    method: 'get',
-    url: `https://account${process.env.DOCUSIGN_PRODUCTION === 'true' ? '' : '-d'}.docusign.com/oauth/userinfo`,
-    headers: {
-      Authorization: `Bearer ${process.env.DOCUSIGN_ACCESS_TOKEN}`
-    }
+
   })
   const result = `HTTP ${r.status} ${r.statusText}${
     r.data.message ? ` - ${r.data.message}` : ''
