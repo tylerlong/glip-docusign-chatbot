@@ -8,6 +8,8 @@ const qs = require('qs')
 const hyperid = require('hyperid')
 const { capitalCase } = require('capital-case')
 
+const { formatResponse } = require('./utils')
+
 const uuid = hyperid()
 
 const x2js = new X2JS()
@@ -102,8 +104,23 @@ module.exports.crontab = async () => {
     })
   })
 
-  // Todo: if refresh failed, send Glip message to admin:
-  // Please [authorize](`${process.env.RINGCENTRAL_CHATBOT_SERVER}/docusign/login`)
+  if (r.status < 200 || r.status >= 300) { // refresh failed
+    // tell the developers
+    let r = await bot.rc.post('/restapi/v1.0/glip/conversations', { members: [{ email: process.env.DEVELOPER_EMAIL }] })
+    await bot.rc.post('/restapi/v1.0/glip/posts', {
+      groupId: r.data.id,
+      text: `There is an error refreshing token: [code]${formatResponse(r)}[/code]`
+    })
+
+    // tell the admin
+    r = await bot.rc.post('/restapi/v1.0/glip/conversations', { members: [{ email: process.env.DOCUSIGN_ADMIN_EMAIL }] })
+    await bot.rc.post('/restapi/v1.0/glip/posts', {
+      groupId: r.data.id,
+      text: `Your authorization has expired, please [authorize](${process.env.RINGCENTRAL_CHATBOT_SERVER}/docusign/login) again, thanks.`
+    })
+
+    return
+  }
 
   const r2 = await httpClient.request({
     method: 'get',
