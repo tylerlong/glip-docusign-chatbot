@@ -45,7 +45,7 @@ module.exports.webhook = async (event) => {
 
 const redirectUri = `${process.env.RINGCENTRAL_CHATBOT_SERVER}/docusign/callback`
 module.exports.login = async (event) => {
-  const url = `https://account${process.env.DOCUSIGN_PRODUCTION ? '' : '-d'}.docusign.com/oauth/auth?response_type=code&scope=signature&&client_id=${process.env.DOCUSIGN_INTEGRATION_KEY}&redirect_uri=${redirectUri}&login_hint=${process.env.DOCUSIGN_ADMIN_EMAIL}`
+  const url = `https://account${process.env.DOCUSIGN_PRODUCTION === 'true' ? '' : '-d'}.docusign.com/oauth/auth?response_type=code&scope=signature&&client_id=${process.env.DOCUSIGN_INTEGRATION_KEY}&redirect_uri=${redirectUri}&login_hint=${process.env.DOCUSIGN_ADMIN_EMAIL}`
   return {
     statusCode: 301,
     headers: {
@@ -56,18 +56,52 @@ module.exports.login = async (event) => {
 
 module.exports.callback = async (event) => {
   const code = event.queryStringParameters.code
-  const r = await axios.post(`https://account${process.env.DOCUSIGN_PRODUCTION ? '' : '-d'}.docusign.com/oauth/token`, {
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${process.env.DOCUSIGN_INTEGRATION_KEY}:${process.env.DOCUSIGN_SECRET_KEY}`).toString('base64')}`
+  const r = await axios.create({
+    validateStatus: () => {
+      return true
+    }
+  }).request({
+    method: 'post',
+    url: `https://account${process.env.DOCUSIGN_PRODUCTION === 'true' ? '' : '-d'}.docusign.com/oauth/token`,
+    auth: {
+      username: process.env.DOCUSIGN_INTEGRATION_KEY,
+      password: process.env.DOCUSIGN_SECRET_KEY
     },
     data: qs.stringify({
       grant_type: 'authorization_code',
-      code,
-      redirect_uri: redirectUri
+      code
     })
   })
+  const result = `HTTP ${r.status} ${r.statusText}${
+      r.data.message ? ` - ${r.data.message}` : ''
+    }
+    Response:
+    ${JSON.stringify(
+      {
+        data: r.data,
+        status: r.status,
+        statusText: r.statusText,
+        headers: r.headers
+      },
+      null,
+      2
+    )}
+    Request:
+    ${JSON.stringify(
+      {
+        method: r.config.method,
+        baseURL: r.config.baseURL,
+        url: r.config.url,
+        params: r.config.params,
+        data: r.config.data,
+        headers: r.config.headers
+      },
+      null,
+      2
+    )}
+    `
   return {
     statusCode: 200,
-    body: JSON.stringify(r.data, 2, null)
+    body: result
   }
 }
