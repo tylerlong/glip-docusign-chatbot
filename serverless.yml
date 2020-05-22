@@ -42,10 +42,10 @@ functions:
     handler: lambda.maintain
     events:
       - schedule: rate(1 day)
-  webhook:
-    handler: lambda.webhook
+  crontab:
+    handler: lambda.crontab
     events:
-      - http: 'POST /docusign/webhook'
+      - schedule: rate(1 hour)
   login:
     handler: lambda.login
     events:
@@ -54,6 +54,14 @@ functions:
     handler: lambda.callback
     events:
       - http: 'GET /docusign/callback'
+  webhook:
+    handler: lambda.webhook
+    events:
+      - http: 'POST /docusign/webhook'
+  sign:
+    handler: lambda.sign
+    events:
+      - http: 'GET /docusign/sign'
 
 resources:
   Resources:
