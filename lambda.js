@@ -188,7 +188,9 @@ module.exports.sign = async (event) => {
     }
   })
   return {
-    statusCode: 200,
-    body: JSON.stringify(r.data, null, 2)
+    statusCode: 301,
+    headers: {
+      Location: r.data.url
+    }
   }
 }
