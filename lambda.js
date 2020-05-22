@@ -2,7 +2,7 @@ const createApp = require('ringcentral-chatbot/dist/apps').default
 const { createAsyncProxy } = require('ringcentral-chatbot/dist/lambda')
 const serverlessHTTP = require('serverless-http')
 const axios = require('axios')
-const { Bot } = require('ringcentral-chatbot/dist/models')
+const { Bot, Service } = require('ringcentral-chatbot/dist/models')
 const X2JS = require('x2js')
 const qs = require('qs')
 
@@ -56,11 +56,13 @@ module.exports.login = async (event) => {
 
 module.exports.callback = async (event) => {
   const code = event.queryStringParameters.code
-  const r = await axios.create({
+  const httpClient = axios.create({
     validateStatus: () => {
       return true
     }
-  }).request({
+  })
+
+  const r = await httpClient.request({
     method: 'post',
     url: `https://account${process.env.DOCUSIGN_PRODUCTION === 'true' ? '' : '-d'}.docusign.com/oauth/token`,
     auth: {
@@ -73,36 +75,37 @@ module.exports.callback = async (event) => {
       redirect_uri: redirectUri
     })
   })
-  const result = `HTTP ${r.status} ${r.statusText}${
-      r.data.message ? ` - ${r.data.message}` : ''
+
+  const r2 = await httpClient.request({
+    method: 'get',
+    url: `https://account${process.env.DOCUSIGN_PRODUCTION === 'true' ? '' : '-d'}.docusign.com/oauth/userinfo`,
+    headers: {
+      Authorization: `Bearer ${r.data.access_token}`
     }
-    Response:
-    ${JSON.stringify(
-      {
-        data: r.data,
-        status: r.status,
-        statusText: r.statusText,
-        headers: r.headers
-      },
-      null,
-      2
-    )}
-    Request:
-    ${JSON.stringify(
-      {
-        method: r.config.method,
-        baseURL: r.config.baseURL,
-        url: r.config.url,
-        params: r.config.params,
-        data: r.config.data,
-        headers: r.config.headers
-      },
-      null,
-      2
-    )}
-    `
+  })
+
+  await Service.destroy({
+    where: {
+      name: 'OAuth',
+      groupId: '0',
+      botId: '0',
+      userId: '0'
+    }
+  })
+
+  const service = await Service.create({
+    name: 'OAuth',
+    botId: '0',
+    groupId: '0',
+    userId: '0',
+    data: {
+      token: r.data,
+      userInfo: r2.data
+    }
+  })
+
   return {
     statusCode: 200,
-    body: result
+    body: JSON.stringify(service, null, 2)
   }
 }
