@@ -26,20 +26,42 @@ module.exports.webhook = async (event) => {
       body: 'Cannot find chatbot. Please ask admin to add chatbot to Glip.'
     }
   }
-  const bot = bots[0]
+  // const bot = bots[0]
   const json = x2js.xml2js(event.body)
-  console.log(event.body)
-  const email = json.DocuSignEnvelopeInformation.EnvelopeStatus.Email
-  let r = await bot.rc.post('/restapi/v1.0/glip/conversations', { members: [{ email }] })
-  console.log(JSON.stringify(r.data))
-  r = await await bot.rc.post('/restapi/v1.0/glip/posts', {
-    groupId: r.data.id,
-    text: `You have a document to sign, please check your inbox of ${email}.`
+  console.log(JSON.stringify(json))
+  // const email = json.DocuSignEnvelopeInformation.EnvelopeStatus.Email
+  const envelopeId = json.DocuSignEnvelopeInformation.EnvelopeStatus.EnvelopeID
+  const service = await Service.findOne({
+    where: {
+      name: 'OAuth',
+      groupId: '0',
+      botId: '0',
+      userId: '0'
+    }
   })
-  console.log(JSON.stringify(r.data))
+  const httpClient = axios.create({
+    validateStatus: () => {
+      return true
+    }
+  })
+  console.log(JSON.stringify(service))
+  const account = service.data.userId.accounts[0]
+  const r = await httpClient.request({
+    method: 'get',
+    url: `${account.base_uri}/restapi/v2.1/accounts/${account.account_id}/envelopes/${envelopeId}/recipients`,
+    headers: {
+      Authorization: `Bearer ${service.data.token.access_token}`
+    }
+  })
+  console.log(r.data)
+  // const r = await bot.rc.post('/restapi/v1.0/glip/conversations', { members: [{ email }] })
+  // await bot.rc.post('/restapi/v1.0/glip/posts', {
+  //   groupId: r.data.id,
+  //   text: `You have a document to sign, please check your inbox of ${email}.`
+  // })
   return {
     statusCode: 200,
-    body: 'Done'
+    body: r.data
   }
 }
 
