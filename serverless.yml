@@ -25,6 +25,7 @@ package:
   exclude:
     - ./**
     - '!lambda.js'
+    - '!utils.js'
     - '!node_modules/**'
   excludeDevDependencies: true
 
