@@ -5,12 +5,10 @@ const axios = require('axios')
 const { Bot, Cache } = require('ringcentral-chatbot/dist/models')
 const X2JS = require('x2js')
 const qs = require('qs')
-const hyperid = require('hyperid')
+const { v4: uuid } = require('uuid')
 const { capitalCase } = require('capital-case')
 
 const { formatResponse } = require('./utils')
-
-const uuid = hyperid()
 
 const x2js = new X2JS()
 
