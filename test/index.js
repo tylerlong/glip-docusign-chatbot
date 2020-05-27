@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const { formatResponse } = require('./utils')
+const { formatResponse } = require('../utils')
 
 ;(async () => {
   const r = await axios.create({
@@ -8,7 +8,7 @@ const { formatResponse } = require('./utils')
       return true
     }
   }).request({
-
+    url: 'http://github.com'
   })
   console.log(formatResponse(r))
 })()

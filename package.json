@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "test": "node -r dotenv-override-true/config index.js"
+    "test": "node -r dotenv-override-true/config test/index.js"
   },
   "dependencies": {
     "axios": "^0.19.2",
