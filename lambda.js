@@ -85,7 +85,7 @@ module.exports.callback = async (event) => {
 }
 
 module.exports.crontab = async () => {
-  const bot = await Bot.findOne() // only one bot since it's a privave app
+  const bot = await Bot.findOne() // only one bot since it's a private app
   if (bot === null) {
     return
   }

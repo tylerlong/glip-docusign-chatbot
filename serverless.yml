@@ -32,7 +32,7 @@ package:
 functions:
   app:
     handler: lambda.app
-    timeout: 300 # this value is not allowed by api gateway but we have proxy below to workaround it
+    timeout: 300
     events:
       - http: 'GET /admin/diagnostic'
   proxy:
