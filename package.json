@@ -6,7 +6,7 @@
     "test": "node -r dotenv-override-true/config test/index.js"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "capital-case": "^1.0.3",
     "pg": "^8.2.1",
     "qs": "^6.9.4",
