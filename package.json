@@ -9,7 +9,7 @@
     "axios": "^0.19.2",
     "capital-case": "^1.0.3",
     "pg": "^8.2.1",
-    "qs": "^6.9.4",
+    "qs": "^6.9.7",
     "ringcentral-chatbot": "^1.5.0",
     "serverless-http": "^2.5.0",
     "uuid": "^8.1.0",
